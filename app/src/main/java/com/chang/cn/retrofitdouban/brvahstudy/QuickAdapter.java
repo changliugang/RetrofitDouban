@@ -30,6 +30,8 @@ public class QuickAdapter extends BaseQuickAdapter<Status> {
                 .linkify(R.id.tweetText);
 
         Glide.with(mContext).load(item.getUserAvatar()).crossFade().placeholder(R.mipmap.def_head).transform(new GlideCircleTransform(mContext)).into((ImageView) helper.getView(R.id.tweetAvatar));
+        Glide.with(mContext).load("http://img3.doubanio.com//view//movie_poster_cover//ipst//public//p494268647.jpg")
+                .crossFade().into((ImageView) helper.getView(R.id.tweetRT));
     }
 
 

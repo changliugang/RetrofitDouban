@@ -44,7 +44,7 @@ public class RetrofitFactory {
                 .addConverterFactory(GsonConverterFactory.create(gson)).build();
     }
 
-    private static <T> T createAPI(Class<T> cls) {
+    private <T> T createAPI(Class<T> cls) {
         return retrofit.create(cls);
     }
 
@@ -53,7 +53,7 @@ public class RetrofitFactory {
         T t = (T) controller.get(controllerInterface);
         if (t == null) {
             synchronized (RetrofitFactory.class) {
-                t = createAPI(controllerInterface);
+                t = new RetrofitFactory().createAPI(controllerInterface);
                 return t;
             }
         } else return t;

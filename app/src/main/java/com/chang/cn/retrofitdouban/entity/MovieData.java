@@ -1,8 +1,11 @@
 package com.chang.cn.retrofitdouban.entity;
 
+import android.text.TextUtils;
+
 import java.util.List;
 
 /**
+ * 电影条目数据实体
  * Created by chang on 2016/7/18.
  */
 public class MovieData {
@@ -100,7 +103,7 @@ public class MovieData {
         private ImagesBean images;
         private String alt;
         private String id;
-        private List<String> genres;
+        private List<String> genres;// 影片类型，最多提供3个
         /**
          * alt : https://movie.douban.com/celebrity/1049485/
          * avatars : {"small":"https://img1.doubanio.com/img/celebrity/small/427.jpg","large":"https://img1.doubanio.com/img/celebrity/large/427.jpg","medium":"https://img1.doubanio.com/img/celebrity/medium/427.jpg"}
@@ -202,6 +205,19 @@ public class MovieData {
             return casts;
         }
 
+        public String getCastsString() {
+            String CastsString = "";
+            if (casts != null && casts.size() > 0) {
+                for (CastsBean cast : casts) {
+                    if (cast != null && !TextUtils.isEmpty(cast.getName())) {
+                        CastsString += "&nbsp;&nbsp;" + cast.getName();
+                    }
+                }
+            }
+
+            return CastsString;
+        }
+
         public void setCasts(List<CastsBean> casts) {
             this.casts = casts;
         }
@@ -230,6 +246,10 @@ public class MovieData {
 
             public double getAverage() {
                 return average;
+            }
+
+            public String getAverageString() {
+                return String.valueOf(average);
             }
 
             public void setAverage(double average) {
@@ -292,7 +312,7 @@ public class MovieData {
              */
 
             private AvatarsBean avatars;
-            private String name;
+            private String name; // 主演名
             private String id;
 
             public String getAlt() {

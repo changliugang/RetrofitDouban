@@ -2,4 +2,7 @@
     <string name="app_name">RetrofitDouban</string>
     <string name="no_data">There is no data</string>
     <string name="load_err">下拉重新加载</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.chang.cn.retrofitdouban">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".AppApplication"
         android:allowBackup="true"
@@ -16,7 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".brvahstudy.StudyBrvahActivity"/>
+        <activity android:name=".brvahstudy.StudyBrvahActivity" />
+        <activity android:name=".activity.MovieDetailActivity" />
+        <activity android:name=".activity.SearchMovieActivity"></activity>
     </application>
 
 </manifest>

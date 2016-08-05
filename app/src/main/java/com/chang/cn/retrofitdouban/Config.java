@@ -8,6 +8,13 @@ import java.util.List;
  */
 public class Config {
 
+    public final static int COMING_SOON = 1;
+
+
+    public final static int PAGE_SIZE = 10;
+
+
+
     public static List<String> stringList(){
         List<String> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
