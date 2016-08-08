@@ -18,8 +18,7 @@ import com.chang.cn.retrofitdouban.activity.BaseActivity;
 public class StudyBrvahActivity extends BaseActivity implements BaseQuickAdapter.RequestLoadMoreListener, SwipeRefreshLayout.OnRefreshListener{
 
     private RecyclerView mRecyclerView;
-//    private QuickAdapter mQuickAdapter;
-    BaseQuickAdapter<Status> adapter;
+    private BaseQuickAdapter<Status> adapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private static final int TOTAL_COUNTER = 18;

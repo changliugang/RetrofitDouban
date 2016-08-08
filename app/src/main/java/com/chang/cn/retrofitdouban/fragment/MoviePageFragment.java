@@ -21,8 +21,6 @@ import com.chang.cn.retrofitdouban.retrofit.MovieApi;
 import com.chang.cn.retrofitdouban.retrofit.RetrofitFactory;
 import com.changlg.cn.tapechat.log.Loglg;
 
-import java.util.List;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import retrofit2.Call;
@@ -32,7 +30,7 @@ import retrofit2.Response;
 /**
  * 电影条目展示
  */
-public class MoviePageFragment extends BaseFragment implements BaseQuickAdapter.RequestLoadMoreListener, SwipeRefreshLayout.OnRefreshListener {
+public class MoviePageFragment extends LazyLoadFragment implements BaseQuickAdapter.RequestLoadMoreListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String ARG_PARAM1 = "movie_api_tag";
     @InjectView(R.id.movie_rl_list)
@@ -47,16 +45,12 @@ public class MoviePageFragment extends BaseFragment implements BaseQuickAdapter.
     private int TOTAL_COUNTER;// 数据总量
     private MovieApi movieApi;
 
+    private View endView;// 加载到最后的提示view
+    private View emptyView;// 无数据view
+
     public MoviePageFragment() {
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param tag Parameter 1.
-     * @return A new instance of fragment MoviePageFragment.
-     */
     public static MoviePageFragment newInstance(int tag) {
         MoviePageFragment fragment = new MoviePageFragment();
         Bundle args = new Bundle();
@@ -73,35 +67,53 @@ public class MoviePageFragment extends BaseFragment implements BaseQuickAdapter.
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_movie_page, container, false);
-        ButterKnife.inject(this, view);
-        return view;
-    }
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//                             Bundle savedInstanceState) {
+//        View view = inflater.inflate(R.layout.fragment_movie_page, container, false);
+//
+//
+//        return view;
+//    }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mMovieSwipeLayout.setOnRefreshListener(this);
-        mMovieRlList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mMovieRlList.setLayoutManager(new LinearLayoutManager(getContext()));
         movieApi = RetrofitFactory.getControllerSingleTon(MovieApi.class);
-        init(null);
+        initRecyclerView();
+        mMovieSwipeLayout.setProgressViewOffset(false, 0, 100);
+        mMovieSwipeLayout.setRefreshing(true);
+
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.reset(this);
+    public void loadData() {
+        super.loadData();
+        requestData(true);
     }
 
-    private void requestData(int start) {
+    @Override
+    public int getLayout() {
+        return R.layout.fragment_movie_page;
+    }
 
+    @Override
+    public void initViews(View view) {
+        ButterKnife.inject(this, view);
+        endView = LayoutInflater.from(getContext()).inflate(R.layout.not_loading, (ViewGroup) mMovieRlList.getParent(), false);
+        emptyView = LayoutInflater.from(getContext()).inflate(R.layout.empty_view, (ViewGroup) mMovieRlList.getParent(), false);
+    }
+
+    private void requestData(final boolean isRefresh) {
         Call<MovieData> callMovie = null;
         switch (mMovieApiTag) {
             case Config.COMING_SOON:
-                callMovie = movieApi.getComingSoon(start, Config.PAGE_SIZE);
+                callMovie = movieApi.getComingSoon(mCurrentCounter, Config.PAGE_SIZE, RetrofitFactory.API_KEY);
+                break;
+            case Config.IN_THEATERS:
+                callMovie = movieApi.getBeShowing(mCurrentCounter, Config.PAGE_SIZE, RetrofitFactory.API_KEY);
                 break;
         }
         if (callMovie != null)
@@ -109,10 +121,21 @@ public class MoviePageFragment extends BaseFragment implements BaseQuickAdapter.
                 @Override
                 public void onResponse(Call<MovieData> call, Response<MovieData> response) {
                     TOTAL_COUNTER = response.body().getTotal();
-                    if (mCurrentCounter == 0)
-                        adapter.setNewData(response.body().getSubjects());
-                    else
-                        adapter.addData(response.body().getSubjects());
+                    if (response.body() != null && response.body().getSubjects() != null)
+                        if (isRefresh) {
+                            adapter.setNewData(response.body().getSubjects());
+                            adapter.openLoadMore(Config.PAGE_SIZE, true);
+                            mCurrentCounter = Config.PAGE_SIZE;
+                            mMovieSwipeLayout.setRefreshing(false);
+                        } else {
+                            if (mCurrentCounter >= TOTAL_COUNTER) {
+                                adapter.notifyDataChangedAfterLoadMore(false);
+                                adapter.addFooterView(endView);
+                            } else {
+                                adapter.notifyDataChangedAfterLoadMore(response.body().getSubjects(), true);
+                                mCurrentCounter = adapter.getData().size();
+                            }
+                        }
                 }
 
                 @Override
@@ -122,20 +145,19 @@ public class MoviePageFragment extends BaseFragment implements BaseQuickAdapter.
             });
     }
 
-    private void init(List<MovieData.SubjectsBean> list) {
-        adapter = new BaseQuickAdapter<MovieData.SubjectsBean>(R.layout.item_movie_card, list) {
+    private void initRecyclerView() {
+        adapter = new BaseQuickAdapter<MovieData.SubjectsBean>(R.layout.item_movie_card, null) {
             @Override
             protected void convert(BaseViewHolder baseViewHolder, MovieData.SubjectsBean item) {
                 baseViewHolder.setText(R.id.item_movie_title, item.getTitle())
                         .setText(R.id.item_movie_rating, item.getRating().getAverageString())
                         .setText(R.id.item_movie_actors, item.getCastsString());
 
-                Glide.with(mContext).load(item.getImages().getSmall()).crossFade()
-                        .placeholder(R.drawable.def_pic).into((ImageView) baseViewHolder.getView(R.id.item_movie_poster));
+                Glide.with(mContext).load(item.getImages().getLarge()).crossFade()
+                        .into((ImageView) baseViewHolder.getView(R.id.item_movie_poster));
             }
         };
         // 设置空数据布局
-        View emptyView = LayoutInflater.from(getActivity()).inflate(R.layout.empty_view, (ViewGroup) mMovieRlList.getParent(), false);
         adapter.setEmptyView(emptyView);
         adapter.openLoadAnimation();
         mCurrentCounter = adapter.getData().size();
@@ -147,13 +169,18 @@ public class MoviePageFragment extends BaseFragment implements BaseQuickAdapter.
     @Override
     public void onRefresh() {
         mCurrentCounter = 0;
-        requestData(mCurrentCounter);
+        requestData(true);
     }
 
     @Override
     public void onLoadMoreRequested() {
-        if (mCurrentCounter >= TOTAL_COUNTER) {
-
-        }
+        requestData(false);
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.reset(this);
+    }
+
 }

@@ -14,9 +14,11 @@ import retrofit2.http.Query;
 public interface MovieApi {
 
     @GET("movie/in_theaters")
-    Call<MovieData> getBeShowing(@Query("start") int start, @Query("count") int count);
+    Call<MovieData> getBeShowing(@Query("start") int start, @Query("count") int count,
+                                 @Query("count") String apikey);
 
     @GET("movie/coming_soon")
-    Call<MovieData> getComingSoon(@Query("start") int start, @Query("count") int count);
+    Call<MovieData> getComingSoon(@Query("start") int start, @Query("count") int count,
+                                  @Query("count") String apikey);
 
 }

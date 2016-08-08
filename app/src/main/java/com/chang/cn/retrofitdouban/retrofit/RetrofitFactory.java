@@ -25,7 +25,9 @@ public class RetrofitFactory {
     // okhttp3配置
     private static final okhttp3.OkHttpClient.Builder builder = new OkHttpClient.Builder();
 
-    public static final String BASE_URL = "https://api.douban.com/v2/";
+    public static final String BASE_URL = "http://api.douban.com/v2/";
+
+    public static final String API_KEY = "090f741bb95bf0041b2e5c532c13d00c";
 
     private static Map<Class<?>, Object> controller = new HashMap<>();
 

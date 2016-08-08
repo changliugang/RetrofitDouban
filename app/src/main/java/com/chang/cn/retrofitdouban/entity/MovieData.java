@@ -210,7 +210,7 @@ public class MovieData {
             if (casts != null && casts.size() > 0) {
                 for (CastsBean cast : casts) {
                     if (cast != null && !TextUtils.isEmpty(cast.getName())) {
-                        CastsString += "&nbsp;&nbsp;" + cast.getName();
+                        CastsString += cast.getName() + "\b\b";
                     }
                 }
             }

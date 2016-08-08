@@ -9,6 +9,8 @@ import java.util.List;
 public class Config {
 
     public final static int COMING_SOON = 1;
+    public final static int IN_THEATERS = 2;
+    public final static int TOP250 = 3;
 
 
     public final static int PAGE_SIZE = 10;
