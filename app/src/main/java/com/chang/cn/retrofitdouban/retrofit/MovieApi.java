@@ -21,4 +21,7 @@ public interface MovieApi {
     Call<MovieData> getComingSoon(@Query("start") int start, @Query("count") int count,
                                   @Query("count") String apikey);
 
+    @GET("movie/top250")
+    Call<MovieData> getTop250(@Query("start") int start, @Query("count") int count,
+                                  @Query("count") String apikey);
 }

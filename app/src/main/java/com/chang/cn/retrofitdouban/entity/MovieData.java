@@ -2,13 +2,14 @@ package com.chang.cn.retrofitdouban.entity;
 
 import android.text.TextUtils;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * 电影条目数据实体
  * Created by chang on 2016/7/18.
  */
-public class MovieData {
+public class MovieData implements Serializable{
 
 
     /**
@@ -80,7 +81,7 @@ public class MovieData {
         this.subjects = subjects;
     }
 
-    public static class SubjectsBean {
+    public static class SubjectsBean implements Serializable{
         /**
          * max : 10
          * average : 6.2
@@ -230,7 +231,7 @@ public class MovieData {
             this.directors = directors;
         }
 
-        public static class RatingBean {
+        public static class RatingBean implements Serializable{
             private int max;
             private double average;
             private String stars;
@@ -273,7 +274,7 @@ public class MovieData {
             }
         }
 
-        public static class ImagesBean {
+        public static class ImagesBean implements Serializable{
             private String small;
             private String large;
             private String medium;
@@ -303,7 +304,7 @@ public class MovieData {
             }
         }
 
-        public static class CastsBean {
+        public static class CastsBean implements Serializable{
             private String alt;
             /**
              * small : https://img1.doubanio.com/img/celebrity/small/427.jpg
@@ -347,7 +348,7 @@ public class MovieData {
                 this.id = id;
             }
 
-            public static class AvatarsBean {
+            public static class AvatarsBean implements Serializable{
                 private String small;
                 private String large;
                 private String medium;
@@ -378,7 +379,7 @@ public class MovieData {
             }
         }
 
-        public static class DirectorsBean {
+        public static class DirectorsBean implements Serializable{
             private String alt;
             /**
              * small : https://img3.doubanio.com/img/celebrity/small/9900.jpg
@@ -422,7 +423,7 @@ public class MovieData {
                 this.id = id;
             }
 
-            public static class AvatarsBean {
+            public static class AvatarsBean implements Serializable{
                 private String small;
                 private String large;
                 private String medium;

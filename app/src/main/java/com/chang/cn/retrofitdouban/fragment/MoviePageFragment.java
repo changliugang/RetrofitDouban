@@ -1,6 +1,7 @@
 package com.chang.cn.retrofitdouban.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -16,13 +17,14 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.chang.cn.retrofitdouban.Config;
 import com.chang.cn.retrofitdouban.R;
+import com.chang.cn.retrofitdouban.activity.MovieDetailActivity;
 import com.chang.cn.retrofitdouban.entity.MovieData;
 import com.chang.cn.retrofitdouban.retrofit.MovieApi;
 import com.chang.cn.retrofitdouban.retrofit.RetrofitFactory;
 import com.changlg.cn.tapechat.log.Loglg;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,9 +35,10 @@ import retrofit2.Response;
 public class MoviePageFragment extends LazyLoadFragment implements BaseQuickAdapter.RequestLoadMoreListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String ARG_PARAM1 = "movie_api_tag";
-    @InjectView(R.id.movie_rl_list)
+
+    @Bind(R.id.movie_rl_list)
     RecyclerView mMovieRlList;
-    @InjectView(R.id.movie_swipeLayout)
+    @Bind(R.id.movie_swipeLayout)
     SwipeRefreshLayout mMovieSwipeLayout;
 
     private BaseQuickAdapter<MovieData.SubjectsBean> adapter;
@@ -67,15 +70,6 @@ public class MoviePageFragment extends LazyLoadFragment implements BaseQuickAdap
         }
     }
 
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.fragment_movie_page, container, false);
-//
-//
-//        return view;
-//    }
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -101,7 +95,7 @@ public class MoviePageFragment extends LazyLoadFragment implements BaseQuickAdap
 
     @Override
     public void initViews(View view) {
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
         endView = LayoutInflater.from(getContext()).inflate(R.layout.not_loading, (ViewGroup) mMovieRlList.getParent(), false);
         emptyView = LayoutInflater.from(getContext()).inflate(R.layout.empty_view, (ViewGroup) mMovieRlList.getParent(), false);
     }
@@ -114,6 +108,9 @@ public class MoviePageFragment extends LazyLoadFragment implements BaseQuickAdap
                 break;
             case Config.IN_THEATERS:
                 callMovie = movieApi.getBeShowing(mCurrentCounter, Config.PAGE_SIZE, RetrofitFactory.API_KEY);
+                break;
+            case Config.TOP250:
+                callMovie = movieApi.getTop250(mCurrentCounter, Config.PAGE_SIZE, RetrofitFactory.API_KEY);
                 break;
         }
         if (callMovie != null)
@@ -163,7 +160,17 @@ public class MoviePageFragment extends LazyLoadFragment implements BaseQuickAdap
         mCurrentCounter = adapter.getData().size();
         adapter.setOnLoadMoreListener(this);
         adapter.openLoadMore(Config.PAGE_SIZE, true);
+        adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+            @Override
+            public void onItemClick(View view, int i) {
+                Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+                intent.putExtra(EXTRA_KEY_1, adapter.getItem(i));
+                startActivity(intent);
+            }
+        });
+
         mMovieRlList.setAdapter(adapter);
+
     }
 
     @Override
@@ -180,7 +187,7 @@ public class MoviePageFragment extends LazyLoadFragment implements BaseQuickAdap
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.reset(this);
+        ButterKnife.unbind(this);
     }
 
 }
